@@ -1,0 +1,44 @@
+Ordem das Funções
+
+0 - função_leitura(parametro nome da função)
+1 - inserefamilia F1 3 / inserefamilia F2 5 / inserefamilia F3 2
+2 - ligafamilias F1 F2 / ligafamilias F2 F3
+3 - inserevirus F3
+4 - iniciasimulacao 50 (função gatilho) / agente_atua 2 / virus_move(dep.!) / vírus_multiplica 5(dep.!) / agente_saude (dependente do agente_atua)
+5 - verificasurto
+
+-------------------------------------------------------------------
+
+O programa:
+
+0 - leitura
+* busca direta pelas funções em ordem
+
+-------------------------------------------------------------------
+
+As listas:
+
+1 - Lista das familias (insere em lista simples)
+id_fam - F1
+qtd_fam - 2
+virus - 0
+prox - 'ponteiro do prox'
+
+Funções:
+insere_familia não tem pré requisitos.
+
+-------------------------
+
+2 - Lista de ligações (busca e insere em lista simples)
+id1_fam - F1
+id2_fam - F2
+prox - 'ponteiro do prox'
+
+Funções:
+ligafamilias tem pré requisitos:
+* verificação das familias existentes na lista familias (busca antes da inserção).
+
+-------------------------
+
+3 - Update na lista familias (campo virus em lista familias)
+
