@@ -2,23 +2,24 @@
 #include<stdlib.h>
 #include<string.h>
 
-typedef struct Familia{
+typedef struct Familia{ // FAMILIA
     char nome_fam;
     int qtd_fam;
     int virus;
     struct Familia *prox;
 }Fam;
-typedef struct CabFam{
+typedef struct CabFam{ //CABECA  PRA FAMILIA
     Fam *prox;
-    Fam *ult;
-    Fam *prim;
+    Fam *ult; // SETA ULTIMO DA LISTA
+    Fam *prim; // SETA PRIMEIRO DA LISTA
 }Cfam;
 
 typedef struct Ligacao{
-    struct Ligacao *p1;
-    struct Ligacao *p2;
+    struct Ligacao *p1; //LIGACAO 1
+    struct Ligacao *p2; //LIGACAO 2
     struct Ligacao *prox;
 }Lig;
+
 void anulaLig(Lig **p){
     (*p)->p1 = NULL;
     (*p)->p2 = NULL;
@@ -60,13 +61,13 @@ void main(){
             fscanf(ent,"%d",&movag); // GUARDA OS MOVIMENTOS APRA DEPOIS
             printf("mov ag %d \n",movag);
         }
-        if(strcmp(func,"vírus_multiplica")==0)//LE A STRING FUNCAO
+        if(strcmp(func,"vírus_multiplica")==0)//COMPARA STRINGS
         {
             printf("%s -> ",func);
             fscanf(ent," %d ",&vmult); // GUARDA O MULTIPLICA PARA DEPOIS 
             printf(" vmult %d \n",vmult);
         }
-        if(strcmp(func,"inserefamilia")==0)//LE A STRING FUNCAO
+        if(strcmp(func,"inserefamilia")==0)//COMPARA STRINGS
         {
             printf("%s -> ",func); 
             fscanf(ent,"%s",fam1); // GUARDA A FAMILIA 
@@ -75,7 +76,7 @@ void main(){
             printf(" qtd fam %d \n",qtd);
             //inserefamilia();
         }
-        if(strcmp(func,"ligafamilias")==0)//LE A STRING FUNCAO
+        if(strcmp(func,"ligafamilias")==0)//COMPARA STRINGS
         {   
             printf("%s -> ",func); 
             fscanf(ent,"%s",fam1); // GUARDA A FAMILIA  1
@@ -84,14 +85,14 @@ void main(){
             printf("fam %s \n",fam2);
             //ligafamilias();
         }
-        if(strcmp(func,"inserevirus")==0)//LE A STRING FUNCAO
+        if(strcmp(func,"inserevirus")==0)//COMPARA STRINGS
         {
             printf("%s -> ",func); 
             fscanf(ent,"%s",fam1); // GUARDA A FAMILIA E JA USA 
             printf("fam %s\n",fam1);
             //inserevirus();
         }
-        if(strcmp(func,"iniciasimulacao")==0)//LE A STRING FUNCAO
+        if(strcmp(func,"iniciasimulacao")==0)//COMPARA STRINGS
         {
             printf("%s -> ",func);
             fscanf(ent,"%d",&mov); //GUARDA OS MOVIMENTOS
@@ -104,7 +105,7 @@ void main(){
             //agente_saude 
             //virus_move
         }
-        if(strcmp(func,"verificasurto")==0)//LE A STRING FUNCAO
+        if(strcmp(func,"verificasurto")==0)//COMPARA STRINGS
         {        
             printf("%s -> ",func);
             printf("VERIFICA SURTO \n");
