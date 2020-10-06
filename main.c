@@ -31,21 +31,24 @@ void anulaFam(Cfam **p){
     (*p)->prox = NULL;
 }
 
-void main(){
-    Cfam *fam = (Cfam*)malloc(sizeof(Cfam)); // LSITA FAMILIAS
-    anulaFam(&fam); //SETA NULL
-    Lig *lig = (Lig*)malloc(sizeof(Lig)); //LISTA LIGACOES
-    anulaLig(&lig); // SETA NULL
+// ENTRADAS COMANDO
+// 1 - CRIA FAMILIA
+// 2 - LIGA FAMILIA
+// 3 - INSERE VIRUS
+// 4 - INICIA SIMULAÇÃO
+// 5 - VERIFICA SURTO
 
-    
-    int movag,vmult,mov; // VARIAVEIS A.ATUA -- V.MULTIPLICA -- MOVIMENTOS
+// a ordem dos subcomandos dependem da forma como eles estão dispostos na função
+
+void comandoArquivo(int comando){
+
+	int movag,vmult,mov; // VARIAVEIS A.ATUA -- V.MULTIPLICA -- MOVIMENTOS
     int qtd; // QTD DE PESSOAS NA FAM
     char fam1[2]; // STRING PARA NOME FAMILIA GENERICO
     char fam2[2];//STRING PARA NOME FAMILIA 2.
     char func[18]; //ARMAZENA STRING FUNCAO
 
-    
-    FILE *ent; // ARQUIVO ENTRADA
+	FILE *ent; // ARQUIVO ENTRADA
     ent = fopen("entrada.txt","r");
 
     if(ent==NULL){
@@ -55,44 +58,56 @@ void main(){
 
     while(!feof(ent)) //ATE O FIM DA LISTA
     {
-        fscanf(ent,"%s",func); //LE A STRING FUNCAO
-        if(strcmp(func,"agente_atua")==0){
-            printf("%s -> ",func);
-            fscanf(ent,"%d",&movag); // GUARDA OS MOVIMENTOS APRA DEPOIS
-            printf("mov ag %d \n",movag);
-        }
-        if(strcmp(func,"vírus_multiplica")==0)//COMPARA STRINGS
-        {
-            printf("%s -> ",func);
-            fscanf(ent," %d ",&vmult); // GUARDA O MULTIPLICA PARA DEPOIS 
-            printf(" vmult %d \n",vmult);
-        }
-        if(strcmp(func,"inserefamilia")==0)//COMPARA STRINGS
+        fscanf(ent,"%s",func); // Le o super texto ent e armazena cada linha em func
+
+        // Cria uma lista para a familia
+
+        if(strcmp(func,"inserefamilia")==0 && comando==1)
         {
             printf("%s -> ",func); 
-            fscanf(ent,"%s",fam1); // GUARDA A FAMILIA 
+            fscanf(ent,"%s",fam1);
             printf("fam %s : ",fam1);
             fscanf(ent,"%d",&qtd);
             printf(" qtd fam %d \n",qtd);
-            //inserefamilia();
         }
-        if(strcmp(func,"ligafamilias")==0)//COMPARA STRINGS
+
+        // Cria uma lista que liga as familias atraves de suas IDs
+
+        if(strcmp(func,"ligafamilias")==0 && comando==2)
         {   
             printf("%s -> ",func); 
-            fscanf(ent,"%s",fam1); // GUARDA A FAMILIA  1
+            fscanf(ent,"%s",fam1); 
             printf("fam %s : ",fam1);
-            fscanf(ent,"%s",fam2); // GUARDA A FAMILIA  2
+            fscanf(ent,"%s",fam2); 
             printf("fam %s \n",fam2);
-            //ligafamilias();
         }
-        if(strcmp(func,"inserevirus")==0)//COMPARA STRINGS
+
+        // Edita a presença de virus nas familias infectadas
+
+        if(strcmp(func,"inserevirus")==0 && comando==3)
         {
             printf("%s -> ",func); 
-            fscanf(ent,"%s",fam1); // GUARDA A FAMILIA E JA USA 
+            fscanf(ent,"%s",fam1); 
             printf("fam %s\n",fam1);
-            //inserevirus();
         }
-        if(strcmp(func,"iniciasimulacao")==0)//COMPARA STRINGS
+
+        // Carrega as informações da 4 parte antes de serem executadas na simulação
+
+        if(strcmp(func,"agente_atua")==0 && comando==4){
+            printf("%s -> ",func);
+            fscanf(ent,"%d",&movag);
+            printf("mov ag %d \n",movag);
+        }
+        if(strcmp(func,"vírus_multiplica")==0 && comando==4)
+        {
+            printf("%s -> ",func);
+            fscanf(ent," %d ",&vmult);
+            printf(" vmult %d \n",vmult);
+        }
+
+        // Inicia a simulação da 4 parte
+
+        if(strcmp(func,"iniciasimulacao")==0 && comando==4)// função gatilho
         {
             printf("%s -> ",func);
             fscanf(ent,"%d",&mov); //GUARDA OS MOVIMENTOS
@@ -105,7 +120,10 @@ void main(){
             //agente_saude 
             //virus_move
         }
-        if(strcmp(func,"verificasurto")==0)//COMPARA STRINGS
+        
+        // Verifica o surto que ocorreu na simulação da 4 parte
+        
+        if(strcmp(func,"verificasurto")==0 && comando==5)
         {        
             printf("%s -> ",func);
             printf("VERIFICA SURTO \n");
@@ -114,7 +132,18 @@ void main(){
             
         }
     }
+}
 
-
+void main(){
+    Cfam *fam = (Cfam*)malloc(sizeof(Cfam)); // LSITA FAMILIAS
+    anulaFam(&fam); //SETA NULL
+    Lig *lig = (Lig*)malloc(sizeof(Lig)); //LISTA LIGACOES
+    anulaLig(&lig); // SETA NULL
+    
+    comandoArquivo(1);
+    comandoArquivo(2);
+    comandoArquivo(3);
+    comandoArquivo(4);
+    comandoArquivo(5);
 
 }
