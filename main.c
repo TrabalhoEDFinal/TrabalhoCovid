@@ -3,7 +3,7 @@
 #include<string.h>
 
 typedef struct Familia{ // FAMILIA
-    char nome_fam;
+    char nome_fam[2];
     int qtd_fam;
     int virus;
     struct Familia *prox;
@@ -14,23 +14,44 @@ typedef struct CabFam{ //CABECA  PRA FAMILIA
     Fam *prim; // SETA PRIMEIRO DA LISTA
 }Cfam;
 
-typedef struct Ligacao{
-    struct Ligacao *p1; //LIGACAO 1
-    struct Ligacao *p2; //LIGACAO 2
-    struct Ligacao *prox;
-}Lig;
-
-void anulaLig(Lig **p){
-    (*p)->p1 = NULL;
-    (*p)->p2 = NULL;
-    (*p)->prox = NULL;
-}
-void anulaFam(Cfam **p){
+void criaFam(Cfam **p){
     (*p)->prim = NULL;
     (*p)->ult = NULL;
     (*p)->prox = NULL;
 }
+void *insere(Cfam **p, char *nome_fam, int qtd_fam){
 
+    Fam *novo = (Fam*)malloc(sizeof(Fam));
+    if(novo == NULL){
+        printf("erro, sistema nao quis dar memoria \n");
+    };
+    strcpy(novo->nome_fam,nome_fam);
+    novo->qtd_fam = qtd_fam;
+    novo->virus = 0;
+    novo->prox = NULL;
+
+    if((*p)->prim == NULL){
+        (*p)->prim = novo;
+        (*p)->ult = novo;
+        (*p)->prox = novo;
+    }
+    else{
+        (*p)->ult->prox  = novo;
+        (*p)->ult = novo;
+    }
+       
+}
+void print(Cfam *p){
+    Fam *aux = p->prox;
+    if(aux == NULL){
+        printf("LISTA VAZIA \n");
+        return;
+    }
+    while(aux != NULL){
+        printf("||FAM: %s || QTD: %d || VIRUS: %d || \n", aux->nome_fam,aux->qtd_fam,aux->virus);
+        aux = aux->prox;
+    }
+}
 // ENTRADAS COMANDO
 // 1 - CRIA FAMILIA
 // 2 - LIGA FAMILIA
@@ -40,7 +61,7 @@ void anulaFam(Cfam **p){
 
 // a ordem dos subcomandos dependem da forma como eles estão dispostos na função
 
-void comandoArquivo(int comando){
+void comandoArquivo(int comando, Cfam **pfam){
 
 	int movag,vmult,mov; // VARIAVEIS A.ATUA -- V.MULTIPLICA -- MOVIMENTOS
     int qtd; // QTD DE PESSOAS NA FAM
@@ -69,6 +90,8 @@ void comandoArquivo(int comando){
             printf("fam %s : ",fam1);
             fscanf(ent,"%d",&qtd);
             printf(" qtd fam %d \n",qtd);
+            insere(&(*pfam),fam1,qtd);
+            print(*pfam);
         }
 
         // Cria uma lista que liga as familias atraves de suas IDs
@@ -136,14 +159,11 @@ void comandoArquivo(int comando){
 
 void main(){
     Cfam *fam = (Cfam*)malloc(sizeof(Cfam)); // LSITA FAMILIAS
-    anulaFam(&fam); //SETA NULL
-    Lig *lig = (Lig*)malloc(sizeof(Lig)); //LISTA LIGACOES
-    anulaLig(&lig); // SETA NULL
-    
-    comandoArquivo(1);
-    comandoArquivo(2);
-    comandoArquivo(3);
-    comandoArquivo(4);
-    comandoArquivo(5);
+    criaFam(&fam); //SETA NULL
+    comandoArquivo(1,&fam);
+    //comandoArquivo(2);
+    //comandoArquivo(3);
+    //comandoArquivo(4);
+    //comandoArquivo(5);
 
 }
