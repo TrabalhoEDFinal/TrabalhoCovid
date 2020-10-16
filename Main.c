@@ -12,8 +12,11 @@
 #include<stdbool.h>
 
 int m = 0; // A quantidade de movimentos globais dos virus
-int ae = 0; // A quantidade de vezes que o agente errou
-int ac = 0; // A quantidade de vezes que o agente acertou
+int nvi = 0; // Numero de virus iniciais
+int nvf = 0; // Numero de virus finais
+int neag = 0; // Numero de erro dos agentes
+int naag = 0; // Numero de acertos dos agentes
+int status = 1; // Status Pandemia
 
 // 1.0.0 - Todas as Structs do Sistema
 // 1.0.1 VIRUS
@@ -26,7 +29,7 @@ typedef struct Familia{
     char nome_fam[2];
     int qtd_fam;
     int qtd_virus;
-    int doente;
+    int doente; // Campo utilizado para verificar o caminho do virus
     struct Virus *infectado;
     struct Familia *prox;
 }Fam;
@@ -185,6 +188,10 @@ char agenteSaude(Cfam **fam)
 	{
 		auxfam = auxfam->prox;
 	}
+	if (auxfam->infectado != NULL)
+		naag++;
+	else
+		neag++;
 	auxfam->qtd_virus = 0;
 	auxfam->doente = 0;
 	auxfam->infectado = NULL; // cura a familia escolhida randomicamente
@@ -198,7 +205,30 @@ void virusMultiplica(Cfam **fam, char *fammult)
 	insereVirus(&(*fam), fammult);
 	printf("%d - Virus se MULTIPLICANDO em %s.\n", m, fammult);
 }
-// 4.0.4 Executa a movimentação do virus
+// 4.0.4 Verifica Status da Pandemia
+void controlesurto(Cfam **fam)
+{
+	int qtdpessoas = 0;
+	int qtdpessinf = 0;
+	Fam *auxfam = (*fam)->prox;
+	if(auxfam == NULL)
+	{
+		printf("A Lista familia está vazia. \n");
+        return;
+	}
+	while(auxfam != NULL)
+	{
+		if (auxfam->infectado != NULL)
+			qtdpessinf += auxfam->qtd_fam; // qtd de pessoas infectadas naquele instante
+		qtdpessoas += auxfam->qtd_fam; // qtd de pessoas no total
+		auxfam = auxfam->prox;
+	}
+	if (qtdpessinf > qtdpessoas*0.8)
+	{
+		status = 2;
+	}
+}
+// 4.0.5 Executa a movimentação do virus
 void virusMove(Cfam **fam, CLfam **lfam, int mov, int agente, int mult)
 {  
 	char familiasvinculadas[100]; // numero maximo de familias vinculadas a uma unica familia
@@ -256,7 +286,7 @@ void virusMove(Cfam **fam, CLfam **lfam, int mov, int agente, int mult)
     			virusMultiplica(&(*fam), auxfam->nome_fam);
     			break;
     		}
-    	
+    		
     		if (auxV->mov % agente == 0 && auxV->mov != 0) // Agente de saude vai atuar
     		{
     			char famagen[3];
@@ -268,7 +298,6 @@ void virusMove(Cfam **fam, CLfam **lfam, int mov, int agente, int mult)
     			if (verificaExistenciaVirus(&(*fam)) == false)
     				break;
     		}
-    		
     		auxV->mov++; // contabiliza o movimento unitario do virus
     		while(auxlfam != NULL) // busca as familias vinculadas a familia infectada
     		{
@@ -326,6 +355,9 @@ void virusMove(Cfam **fam, CLfam **lfam, int mov, int agente, int mult)
 				auxfam->qtd_virus--;
 				antV->prox = NULL;
 			}
+			controlesurto(&(*fam));
+			if (m == mov-1 && verificaExistenciaVirus(&(*fam)) == true)
+		    		status = 3;
 			printf("%d - Virus movido para %s.\n", m, famdest);
     		m++; // contabiliza o movimento global dos virus 		
     	}
@@ -345,6 +377,47 @@ void printFam(Cfam *p){
         printf("||FAM: %s || QTD: %d || QTDVIRUS: %d|| DOENTE: %d|| \n", aux->nome_fam,aux->qtd_fam,aux->qtd_virus,aux->doente);
         aux = aux->prox;
     }
+}
+// 5.0.2 Verifica Surto
+void verificasurto(Cfam **fam)
+{
+	Fam *auxfam = (*fam)->prox;
+	if(auxfam == NULL)
+	{
+		printf("A Lista familia está vazia. \n");
+        return;
+	}
+	while(auxfam != NULL)
+	{
+		nvf += auxfam->qtd_virus;
+		auxfam = auxfam->prox;
+	}
+	FILE *log;
+	log = fopen("logfile.txt", "w");
+	if (log==NULL) {
+		printf("Erro na abertura do arquivo.\n");
+		exit(1); //aborta o programa
+	}	//abre o arquivo de texto saida.txt para gravado
+	fprintf(log, "Numero de movimentos totais: %d\n", m);
+	 fprintf(log, "Numero de virus iniciais: %d\n", nvi);
+	 fprintf(log, "Numero de virus finais: %d\n", nvf);
+	 fprintf(log, "Numero de erros do agente: %d\n", neag);
+	 fprintf(log, "Numero de acertos do agente: %d\n", naag);
+	if (status == 1)
+	{
+		printf("%s\n", "Status: Não houve surto.");
+		fprintf(log, "Status: Não houve surto.");
+	}
+	if (status == 2)
+	{
+		printf("%s\n", "Status: Houve surto mais foi controlado/erradicado.");
+		fprintf(log, "Status: Houve surto mais foi controlado/erradicado.");
+	}
+	if (status == 3)
+	{
+		printf("%s\n", "Status: Houve surto.");
+		fprintf(log, "Status: Houve surto.");
+	}
 }
 
 // FUNÇÃO PRINCIPAL DE EXECUÇÃO DOS COMANDOS POR ORDEM
@@ -424,6 +497,7 @@ void comandoArquivo(int comando, Cfam **pfam, CLfam **plfam){
         if(strcmp(func,"inserevirus")==0 && comando==3)
         {
         	fscanf(ent,"%s",faminf);
+        	nvi++;
             printf("Infectando a familia %s.\n", faminf);
             insereVirus(&(*pfam),faminf);
         }
@@ -457,18 +531,14 @@ void comandoArquivo(int comando, Cfam **pfam, CLfam **plfam){
 		        else
 		        	virusMove(&(*pfam),&(*plfam), mov, movag, vmult);
 		    }
-
+		    
         }
         
-        // Verifica o surto que ocorreu na simulação da 4 parte
-        
+        // Verifica o surto que ocorreu na simulação da 4 parte 
         if(strcmp(func,"verificasurto")==0 && comando==5)
         {        
-            
-            printf("VERIFICA SURTO \n");
-            //verificasurto();
-            break;
-            
+            verificasurto(&(*pfam));
+            break;       
         }
     }
 }
@@ -484,7 +554,10 @@ void main()
     comandoArquivo(1,&fam,&Lfam);
     comandoArquivo(2,&fam,&Lfam);
     comandoArquivo(3,&fam,&Lfam);
+    printFam(fam);
     comandoArquivo(4,&fam,&Lfam);
     printf("------------- Relatórios -------------\n");
     printFam(fam);
+    comandoArquivo(5,&fam,&Lfam);
+    printf("m: %d nvi: %d nvf: %d neag: %d naag: %d\n", m, nvi, nvf, neag, naag);
 }
